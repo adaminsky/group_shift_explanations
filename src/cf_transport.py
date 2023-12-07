@@ -7,6 +7,7 @@ import pandas as pd
 def get_dice_transformed(model, full_data, source_data, target_name, desired_class):
     d = dice_ml.Data(dataframe=full_data,
                      continuous_features=list(full_data.drop(columns=[target_name]).columns),
+                    #  continuous_features=continuous_features,
                      outcome_name=target_name)
     m = dice_ml.Model(model=model, backend="PYT")
     exp = dice_ml.Dice(d, m, method="gradient")

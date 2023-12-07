@@ -6,6 +6,9 @@ import torch
 
 def W2_dist(X1: np.ndarray, X2: np.ndarray, squared=True) -> float:
     """Calculate the squared Wasserstein-2 distance between the distributions"""
+    np.random.seed(0)
+    torch.manual_seed(0)
+
     a, b = ot.utils.unif(X1.shape[0]), ot.utils.unif(X2.shape[0])
     M = ot.utils.euclidean_distances(X1, X2, squared=True)
     W2_squared = ot.emd2(a, b, M, numItermax=int(1e9))
@@ -17,7 +20,7 @@ def group_percent_explained(source, source_t, target, source_groups, target_grou
     W2_squared_t = W2_dist(source_t, target)
     pe = (W2_squared - W2_squared_t) / W2_squared
     total_pe = pe * 100
-    print("Total Percent Explained:", pe * 100)
+    # print("Total Percent Explained:", pe * 100)
 
     features_keep = []
     for f in range(source_groups.shape[1]):
@@ -31,9 +34,9 @@ def group_percent_explained(source, source_t, target, source_groups, target_grou
         W2_squared_t = W2_dist(source_t[source_groups[:, f]==1], target[target_groups[:, f]==1])
         pe = (W2_squared - W2_squared_t) / W2_squared if W2_squared > 0 else 1
         pes.append(pe)
-        print(f"{group_names[f]}", "Percent Explained:", pe * 100)
-    print("Worst group PE:", np.min(np.array(pes)) * 100)
-    return total_pe, np.min(np.array(pes)) * 100
+        # print(f"{group_names[f]}", "Percent Explained:", pe * 100)
+    # print("Worst group PE:", np.min(np.array(pes)) * 100)
+    return total_pe, np.min(np.array(pes)) * 100, np.array(pes) * 100
 
 def percent_flipped(model, source, source_t, groups):
     with torch.no_grad():

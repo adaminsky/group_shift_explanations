@@ -6,74 +6,47 @@ directory by following the directions under "Dataset Setup." The scripts can
 then be run using Docker as described in Section "Running with Docker."
 
 ## Dataset Setup
+### Adult Dataset
+Download the Adult tabular dataset from
+https://archive.ics.uci.edu/ml/machine-learning-databases/adult/adult.data and
+create the directory `data/adult/` where `adult.data` should be placed.
+
+### Breast Dataset
+Download the Breast tabular dataset from
+https://www.kaggle.com/datasets/uciml/breast-cancer-wisconsin-data and create
+the directory `data/breast` where `data.csv` should be placed.
+
 ### ImageNet Datset
 Download the ImageNet dataset from
 https://www.kaggle.com/c/imagenet-object-localization-challenge/overview/description.
-If you are not using Docker, then create a soft link to the directory
-`ILSVRC/Data/CLS-LOC/val/` in the ImageNet data to the directory
-`data/imagenet/` in this repository.
+Then, create a soft link to the directory `ILSVRC/Data/CLS-LOC/val/` in the
+ImageNet data to the directory `data/imagenet/` in this repository.
+
 
 ## Running with Docker
-Navigate to the main directory `group_shift_explanations/` and build the docker
-image with the following:
+Navigate to the main directory `explainable_domain_shift/` and build the docker image with the following:
 ```bash
 docker build -t explainshift:latest .
 ```
 
-### Reproducing experiments from the paper
-To rerun all the the experiments shown in the paper, run the following:
-
-Robustness experiments:
+To run the experiments in the container, run the following:
 ```bash
-docker run -it \
-	-v $(pwd)/data:/workspace/group_shift_explanations/data \
-	explainshift:latest \
-	python robustness_exp.py --method kmeans --dataset adult --train
+docker run -it explainshift:latest \
+	-v $(pwd)/base:/workspace/explainable_domain_shift/data/base \
+	python base_exp.py --method kmeans --dataset adult --train
 ```
 
 Worst-case Robustness experiments:
 ```bash
-docker run -it \
-	-v $(pwd)/data:/workspace/group_shift_explanations/data \
-	explainshift:latest \
-	python robustness_exp.py --method kmeans --dataset adult --train --adv
+docker run -it explainshift:latest \
+	-v $(pwd)/base:/workspace/explainable_domain_shift/data/base \
+	python base_exp.py --method kmeans --dataset adult --adv --train
 ```
 
 The allowed values for the `--method` flag are `kmeans` for K-cluster, `dice`,
 and `ot`. The allowed values for the `--dataset` flag are `adult`, `breast`,
-`nlp`, and `imagenet`.
+`nlp`, `nlp-amazon`, `fmow`, `iwildcam`, `imagenet`.
 
-Regular experiments:
-```bash
-# For the CivilComments experiments
-docker run -it \
-	-v $(pwd)/data:/workspace/group_shift_explanations/data \
-	explainshift:latest \
-	python nlp_explore.py
-```
-
-```bash
-# For the ImageNet and Tabular data experiments
-docker run -it \
-	-v $(pwd)/data:/workspace/group_shift_explanations/data \
-	-v <PATH-TO-IMAGENET>/ILSVRC/Data/CLS-LOC/val/:/workspace/group_shift_explanations/data/imagenet \
-	-p 8888:8888 explainshift:latest \
-	/bin/bash -c "jupyter lab --ip 0.0.0.0 --allow-root --no-browser"
-```
-
-The provided scripts with their experiments are listed below:
-
-- `tabular_explore_multiseed.ipynb`: Tabular data experiments
-- `imagenet_breed_groups_multiseed.ipynb`: ImageNet experiments
-- `nlp_explore.py`: Language data experiments
-
-### Using a custom dataset
-To learn a Group-aware Shift Explanation on a custom dataset, use the
-`scripts/custom_data.ipynb` notebook. This notebook takes an arbitrary source
-and target dataset along with groups for the source and target data and then
-learns a Group-aware Shift Explanation. Follow the instructions for "Running
-with Docker" to run the jupyter lab server and then open the
-`scripts/custom_data.ipynb` notebook.
 
 # Citation
 ```bibtex
